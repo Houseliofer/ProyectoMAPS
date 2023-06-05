@@ -30,10 +30,48 @@ function App() {
     setMap(newMap);
   };
 
+  const handleSearchInputChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchInput.trim() !== '') {
+      searchPlaces();
+    }
+  };
+  
+
+  const searchPlaces = () => {
+    if (map && searchInput.trim() !== '') {
+      const placesService = new window.google.maps.places.PlacesService(map);
+      const searchRequest = {
+        query: searchInput,
+      };
+      placesService.textSearch(searchRequest, handleSearchResults);
+    }
+  };
+
+  const handleSearchResults = (results, status) => {
+    if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+      setPlaces(results);
+    }
+  };
+
   return (
     <div>
       <h1>Buscador de Lugares</h1>
+      <form onSubmit={handleSearchSubmit}>
+        <input
+          type="text"
+          value={searchInput}
+          onChange={handleSearchInputChange}
+          placeholder="Ingrese un lugar"
+        />
+        <button type="submit">Buscar</button>
+      </form>
       <div id="map" style={{ height: '400px', marginTop: '20px' }}></div>
+      <div>
       {places.length > 0 && (
         <ul>
           {places.map((place) => (
@@ -41,6 +79,7 @@ function App() {
           ))}
         </ul>
       )}
+      </div>
     </div>
   );
 }
